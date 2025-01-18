@@ -1,57 +1,41 @@
-# Install required packages if not already installed
-install.packages(c("tidyverse",
-                   "shiny", 
-                   "shinydashboard", 
-                   "lubridate",
-                   "janitor",
-                   "here",
-                   "DT"))
+# install and load packages
+pacman::p_load(
+  rio,            # for importing/exporting data
+  here,           # for relative file paths
+  skimr,          # for reviewing the data
+  janitor,        # for cleaning and tabulating data
+  epikit,         # for creating age categories
+  tidyverse)      # for data management and visualization
 
-# Load the libraries
-library(tidyverse)
-library(shiny)
-library(shinydashboard)
-library(lubridate)
-library(janitor)
-library(here)
-library(readr)
 
 # Import dataset ----
-healthcare_dataset_raw <- read_csv("healthcare_dataset_raw.csv")
+linelist_raw <- import(here("data", "healthcare_dataset.csv"))
 
 # data cleaning ----
 
-# check for missing data
-sum(is.na(linelist_reordered_final))  # total number of NAs in dataset
-colSums(is.na(linelist_reordered_final))  # number of NAs in each column
+linelist_cleaned <- linelist_raw %>%    # create "clean" dataset, starting with the raw
+  clean_names() %>%                                        # clean the column names
+  distinct() %>%                                           # de-duplicate rows
+  select(
+    name,      gender,   age,   blood_type, 
+         medical_condition,   date_of_admission,     
+            discharge_date,    doctor, hospital, 
+        insurance_provider,      billing_amount,    
+               room_number,      admission_type,        
+                medication,        test_results
+    ) %>%                                                  #re-order columns
+  mutate(
+    discharge_date = as.Date(discharge_date),
+    date_of_admission = as.Date(date_of_admission),
+    hospitalization_duration = as.numeric(discharge_date - date_of_admission)
+    , .after = discharge_date              
+  )                                                        #add column
 
-# standardize column name syntax  
-linelist <- healthcare_dataset_raw %>% 
-  janitor::clean_names()
 
-# removing duplicate rows
-linelist <- linelist %>% 
-  distinct()
 
-# printing columns names for columns reorder
-names(linelist)
 
-# reordered linelist
-linelist_reordered <- linelist %>% 
-  select(name, gender, age, blood_type, medical_condition,
-         date_of_admission, discharge_date, doctor, hospital, 
-         insurance_provider, billing_amount, room_number,
-         admission_type, medication, test_results)
-  
-# adding a new column of hospitalization duration
-linelist_reordered_final <- linelist_reordered %>% 
-  mutate(hopitalization_duration = discharge_date - date_of_admission,
-         .after = discharge_date)
 
-# create cleaned 
-healthcare_dataset_cleaned <- linelist_reordered_final
-  healthcare_dataset_cleaned
 
 # export cleaned dataset
-write_csv(healthcare_dataset_cleaned, "healthcare_dataset_cleaned.csv")
+write_csv(linelist_cleaned, here("data", "linelist_cleaned.csv"))
 
