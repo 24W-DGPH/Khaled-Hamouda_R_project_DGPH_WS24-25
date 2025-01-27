@@ -21,7 +21,8 @@ life_exp_columns <- c("country", as.character(1800:2100))
 # Pivoting data
 life_exp_longer <- life_exp %>%
   # Add column names
-  setNames(column_names) %>%
+  setNames(life_exp_columns) %>%
+  #filter(country != country) %>%
   # Pivot longer all columns except country
   pivot_longer(
     cols = -country,
@@ -44,6 +45,7 @@ health_xp_columns <- c("country", as.character(1995:2010))
 health_xp_longer <- health_xp %>%
   # Add column names
   setNames(health_xp_columns) %>%
+  #filter(country != country) %>%
   # Pivot longer all columns except country
   pivot_longer(
     cols = -country,
