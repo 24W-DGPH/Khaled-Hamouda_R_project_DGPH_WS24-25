@@ -1,0 +1,12 @@
+name: App_folder
+title: App_folder
+username: khaled-hamouda
+account: khaled-hamouda
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13831362
+bundleId: 9712266
+url: https://khaled-hamouda.shinyapps.io/App_folder/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
